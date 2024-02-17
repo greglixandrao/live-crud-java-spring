@@ -1,4 +1,5 @@
 FROM openjdk:17
+LABEL name=docker-java-app
 VOLUME /tmp
 ARG JAR_FILE=target/crud-0.0.1-SNAPSHOT.jar
 COPY ${JAR_FILE} /tmp
