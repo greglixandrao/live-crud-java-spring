@@ -7,7 +7,10 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/product")
@@ -28,11 +31,17 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity updateProduct(@PathVariable String id, @RequestBody @Valid RequestProduct data){
-        Product product = repository.getReferenceById(id);
-        product.setName(data.name());
-        product.setPrice_in_cents(data.price_in_cents());
-        return  ResponseEntity.ok(product);
+    @PutMapping
+    @Transactional
+    public ResponseEntity updateProduct(@RequestBody @Valid RequestProduct data){
+        Optional<Product> optionalProduct = repository.findById(data.id());
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            product.setName(data.name());
+            product.setPrice_in_cents(data.price_in_cents());
+            return  ResponseEntity.ok(product);
+        } else {
+            return  ResponseEntity.notFound().build();
+        }
     }
 }
